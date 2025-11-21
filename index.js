@@ -554,13 +554,13 @@ app.get('/api/usda/commodities', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: Código da commodity (ex: 0440000 para milho)
+ *         description: "Código da commodity (ex: 0440000 para milho)"
  *       - in: path
  *         name: countryCode
  *         required: true
  *         schema:
  *           type: string
- *         description: Código do país (ex: BR para Brasil)
+ *         description: "Código do país (ex: BR para Brasil)"
  *       - in: path
  *         name: year
  *         required: true
@@ -602,7 +602,7 @@ app.get('/api/usda/commodity/:commodityCode/country/:countryCode/year/:year', as
  *         required: true
  *         schema:
  *           type: string
- *         description: Código da commodity (ex: 0440000 para milho, 2222000 para soja)
+ *         description: "Código da commodity (ex: 0440000 para milho, 2222000 para soja)"
  *       - in: path
  *         name: year
  *         required: true
@@ -752,7 +752,7 @@ app.get('/api/usda/countries', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: Nome da cidade (ex: São Paulo, Rio de Janeiro)
+ *         description: "Nome da cidade (ex: São Paulo, Rio de Janeiro)"
  *     responses:
  *       200:
  *         description: Previsão do tempo para 5 dias
@@ -845,7 +845,7 @@ app.get('/api/weather/current/:city', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: Nome da cidade (normalizado, ex: saopaulo, chapadaodosul)
+ *         description: "Nome da cidade (normalizado, ex: saopaulo, chapadaodosul)"
  *       - in: path
  *         name: layer
  *         required: true
