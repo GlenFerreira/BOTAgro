@@ -147,6 +147,16 @@ Utilitários compartilhados entre os módulos.
 
 Todos os módulos estão disponíveis através de rotas HTTP REST. A documentação completa está disponível via Swagger.
 
+### 🚀 Servidor em Produção
+
+O servidor está hospedado no **Render** e está disponível em:
+
+**URL Base:** `https://botagro.onrender.com`
+
+**Documentação Swagger:** [https://botagro.onrender.com/api-docs](https://botagro.onrender.com/api-docs)
+
+**Health Check:** [https://botagro.onrender.com/health](https://botagro.onrender.com/health)
+
 ### Endpoints Disponíveis
 
 #### USDA (Commodities)
@@ -174,6 +184,33 @@ Todos os módulos estão disponíveis através de rotas HTTP REST. A documentaç
 - `GET /health` - Status do servidor
 
 ### Exemplos de Uso
+
+#### Produção (Render)
+
+```bash
+# Health Check
+curl https://botagro.onrender.com/health
+
+# Buscar dados de milho do Brasil em 2025
+curl https://botagro.onrender.com/api/usda/commodity/0440000/brazil/2025
+
+# Previsão do tempo para São Paulo
+curl https://botagro.onrender.com/api/weather/forecast/São%20Paulo
+
+# Clima atual de São Paulo
+curl https://botagro.onrender.com/api/weather/current/São%20Paulo
+
+# Verificar se existe imagem de chuva para São Paulo
+curl https://botagro.onrender.com/api/clima/images/saopaulo/rain
+
+# Listar todas as commodities
+curl https://botagro.onrender.com/api/usda/commodities
+
+# Listar países disponíveis
+curl https://botagro.onrender.com/api/usda/countries
+```
+
+#### Desenvolvimento Local
 
 ```bash
 # Buscar dados de milho do Brasil em 2025
@@ -223,18 +260,17 @@ OPENWEATHER_API_KEY=sua_chave_openweather_aqui
 
 ## 📚 Documentação Swagger
 
-A documentação completa da API está disponível via Swagger UI quando o servidor está rodando:
+A documentação completa da API está disponível via Swagger UI.
+
+### 🌐 Produção (Render)
+
+**URL:** [https://botagro.onrender.com/api-docs](https://botagro.onrender.com/api-docs)
+
+Acesse diretamente no navegador para explorar e testar todos os endpoints disponíveis.
+
+### 💻 Desenvolvimento Local
 
 **URL:** `http://localhost:3000/api-docs`
-
-A documentação Swagger inclui:
-- Descrição de todos os endpoints
-- Parâmetros necessários
-- Exemplos de requisições e respostas
-- Códigos de status HTTP
-- Schemas de dados
-
-### Acessando a Documentação
 
 1. Inicie o servidor:
    ```bash
@@ -246,7 +282,14 @@ A documentação Swagger inclui:
    http://localhost:3000/api-docs
    ```
 
-3. Explore os endpoints disponíveis e teste diretamente pela interface Swagger.
+### 📋 O que você encontra no Swagger
+
+- Descrição de todos os endpoints
+- Parâmetros necessários
+- Exemplos de requisições e respostas
+- Códigos de status HTTP
+- Schemas de dados
+- Teste interativo dos endpoints
 
 ## 🔄 Integração com o Bot
 
@@ -281,8 +324,18 @@ Os módulos são automaticamente integrados ao bot do WhatsApp:
 
 ## 🔗 Links Úteis
 
+### APIs Externas
 - [Documentação USDA PSD API](https://apps.fas.usda.gov/psdonline/app/index.html#/app/help)
 - [Documentação OpenWeather API](https://openweathermap.org/api)
 - [Documentação Windy API](https://www.windy.com/)
+
+### Documentação e Ferramentas
 - [Swagger UI](https://swagger.io/tools/swagger-ui/)
+- [Render Dashboard](https://dashboard.render.com)
+- [Documentação Render](https://render.com/docs)
+
+### APIs em Produção
+- **Health Check:** https://botagro.onrender.com/health
+- **Swagger UI:** https://botagro.onrender.com/api-docs
+- **Repositório GitHub:** https://github.com/GlenFerreira/BOTAgro
 
