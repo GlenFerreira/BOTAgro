@@ -1,0 +1,19 @@
+{
+  "name": "windy-forecast",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "forecast_with_contour.mjs",
+  "scripts": {
+    "forecast": "node forecast_with_contour.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Script para gerar mapas de previsão meteorológica do Windy com contorno do Brasil",
+  "dependencies": {
+    "canvas": "^3.2.0",
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^21.0.0"
+  }
+}
+

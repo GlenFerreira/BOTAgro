@@ -1,0 +1,108 @@
+# Dependências
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+modulos/.env
+modulos/.env.local
+
+# Arquivos de cache e temporários
+.wwebjs_auth/
+.wwebjs_cache/
+.cache/
+*.cache
+.temp/
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Arquivos do sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de build e dist
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+
+# Arquivos de teste e cobertura
+coverage/
+.nyc_output/
+*.lcov
+.jest/
+
+# Arquivos de imagens geradas (módulo clima)
+modulos/clima/imgrain/
+modulos/clima/imgtemp/
+modulos/clima/imgwind/
+modulos/clima/imgcloud/
+modulos/clima/imgradar/
+modulos/clima/imgsat/
+modulos/clima/imgthund/
+modulos/clima/imgrt/
+modulos/clima/*.png
+modulos/clima/**/*.png
+
+# Arquivos temporários do Puppeteer
+.local-chromium/
+.local-browsers/
+
+# Arquivos de backup
+*.bak
+*.backup
+*.old
+*~
+
+# Arquivos de configuração local
+config.local.js
+config.local.json
+
+# Arquivos de upload
+uploads/
+files/
+storage/
+
+# Arquivos de sessão
+sessions/
+*.session
+
+# Arquivos de erro
+error.log
+error-*.log
+
