@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: bot-agro-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Adicione suas variáveis de ambiente no painel do Render
+      # ou descomente e configure abaixo:
+      # - key: OPENAI_API_KEY
+      #   sync: false
+      # - key: WHATSAPP_TOKEN
+      #   sync: false
+      # - key: WHATSAPP_PHONE_NUMBER_ID
+      #   sync: false
+      # - key: VERIFY_TOKEN
+      #   sync: false
+      # - key: WEBHOOK_URL
+      #   sync: false
+      # - key: OPENWEATHER_API_KEY
+      #   sync: false
+      # - key: USDA_PSD_API_KEY
+      #   sync: false
+      # - key: WINDY_API_KEY
+      #   sync: false
+

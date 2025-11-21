@@ -20,30 +20,27 @@ const __dirname = path.dirname(__filename);
 // Carrega variáveis de ambiente
 dotenv.config();
 
-// Verifica se as chaves estão configuradas
+// Verifica se as chaves estão configuradas (apenas avisa, não bloqueia para APIs funcionarem)
 if (!process.env.OPENAI_API_KEY) {
-    console.error('❌ Erro: OPENAI_API_KEY não encontrada no arquivo .env');
-    process.exit(1);
+    console.warn('⚠️ Aviso: OPENAI_API_KEY não encontrada. Funcionalidades de IA podem não funcionar.');
 }
 
 if (!process.env.WHATSAPP_TOKEN) {
-    console.error('❌ Erro: WHATSAPP_TOKEN não encontrada no arquivo .env');
-    console.log('📝 Obtenha o token em: https://developers.facebook.com/apps/');
-    process.exit(1);
+    console.warn('⚠️ Aviso: WHATSAPP_TOKEN não encontrada. Webhook do WhatsApp não funcionará.');
+    console.warn('📝 As APIs REST continuarão funcionando normalmente.');
 }
 
-// Verifica se o token não está vazio ou apenas espaços
-const token = process.env.WHATSAPP_TOKEN.trim();
-if (!token || token.length < 10) {
-    console.error('❌ Erro: WHATSAPP_TOKEN parece estar vazio ou inválido');
-    console.log('📝 Verifique se o token foi copiado corretamente no arquivo .env');
-    process.exit(1);
+// Verifica se o token não está vazio ou apenas espaços (se existir)
+let token = '';
+if (process.env.WHATSAPP_TOKEN) {
+    token = process.env.WHATSAPP_TOKEN.trim();
+    if (!token || token.length < 10) {
+        console.warn('⚠️ Aviso: WHATSAPP_TOKEN parece estar vazio ou inválido');
+    }
 }
 
 if (!process.env.WHATSAPP_PHONE_NUMBER_ID) {
-    console.error('❌ Erro: WHATSAPP_PHONE_NUMBER_ID não encontrada no arquivo .env');
-    console.log('📝 Use o número de teste do Meta for Developers');
-    process.exit(1);
+    console.warn('⚠️ Aviso: WHATSAPP_PHONE_NUMBER_ID não encontrada. Webhook do WhatsApp não funcionará.');
 }
 
 // Inicializa o cliente OpenAI
@@ -73,14 +70,16 @@ const config = {
     maxTokens: parseInt(process.env.MAX_TOKENS) || 500,
     temperature: parseFloat(process.env.TEMPERATURE) || 0.7,
     whatsappToken: whatsappToken,
-    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
     verifyToken: process.env.VERIFY_TOKEN || 'meu_token_secreto_123',
-    webhookUrl: process.env.WEBHOOK_URL || 'http://localhost:3000',
+    webhookUrl: process.env.WEBHOOK_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
     port: parseInt(process.env.PORT) || 3000,
 };
 
-// URL base da API do WhatsApp
-const WHATSAPP_API_URL = `https://graph.facebook.com/v22.0/${config.phoneNumberId}`;
+// URL base da API do WhatsApp (apenas se configurado)
+const WHATSAPP_API_URL = config.phoneNumberId 
+    ? `https://graph.facebook.com/v22.0/${config.phoneNumberId}`
+    : null;
 
 // Função para gerar o contexto do sistema do bot
 function getSystemContext() {
@@ -128,25 +127,35 @@ app.use((req, res, next) => {
     next();
 });
 
-// Endpoint para verificação do webhook (GET)
+// Endpoint para verificação do webhook (GET) - apenas se WhatsApp estiver configurado
 app.get('/webhook', (req, res) => {
+    if (!config.phoneNumberId || !config.whatsappToken) {
+        return res.status(503).json({ 
+            error: 'WhatsApp não configurado',
+            message: 'As APIs REST estão disponíveis, mas o webhook do WhatsApp requer configuração.'
+        });
+    }
+
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
-    console.log('🔍 Verificação do webhook recebida');
-
     if (mode === 'subscribe' && token === config.verifyToken) {
-        console.log('✅ Webhook verificado com sucesso!');
         res.status(200).send(challenge);
     } else {
-        console.error('❌ Falha na verificação do webhook');
         res.sendStatus(403);
     }
 });
 
-// Endpoint para receber mensagens (POST)
+// Endpoint para receber mensagens (POST) - apenas se WhatsApp estiver configurado
 app.post('/webhook', async (req, res) => {
+    if (!config.phoneNumberId || !config.whatsappToken) {
+        return res.status(503).json({ 
+            error: 'WhatsApp não configurado',
+            message: 'As APIs REST estão disponíveis, mas o webhook do WhatsApp requer configuração.'
+        });
+    }
+
     try {
         const body = req.body;
 
@@ -339,6 +348,10 @@ async function gerarRespostaIA(mensagem, nomeUsuario) {
 // Função para enviar mensagem via API do WhatsApp
 async function enviarMensagem(to, message) {
     try {
+        if (!WHATSAPP_API_URL) {
+            throw new Error('WhatsApp não configurado');
+        }
+        
         const response = await axios.post(
             `${WHATSAPP_API_URL}/messages`,
             {
@@ -366,6 +379,10 @@ async function enviarMensagem(to, message) {
 
 // Função para enviar imagem via API do WhatsApp
 async function enviarImagem(to, imagePath, caption = '') {
+    if (!WHATSAPP_API_URL) {
+        throw new Error('WhatsApp não configurado');
+    }
+    
     try {
         // Passo 1: Fazer upload da imagem para obter o media_id
         const imageBuffer = fs.readFileSync(imagePath);
@@ -403,6 +420,10 @@ async function enviarImagem(to, imagePath, caption = '') {
             messagePayload.image.caption = caption;
         }
 
+        if (!WHATSAPP_API_URL) {
+            throw new Error('WhatsApp não configurado');
+        }
+        
         const response = await axios.post(
             `${WHATSAPP_API_URL}/messages`,
             messagePayload,
@@ -950,19 +971,28 @@ app.get('/api/clima/images/:city/:layer/file', (req, res) => {
     }
 });
 
-// Inicia o servidor
-app.listen(config.port, () => {
-    console.log('🚀 Bot de WhatsApp iniciado!');
-    console.log(`🤖 Nome do bot: ${config.botName}`);
+// Inicia o servidor (escuta em 0.0.0.0 para funcionar no Render)
+app.listen(config.port, '0.0.0.0', () => {
+    console.log('🚀 Servidor iniciado!');
+    console.log(`🤖 Nome: ${config.botName}`);
     console.log(`🌐 Servidor rodando na porta ${config.port}`);
-    console.log(`📡 Webhook URL: ${config.webhookUrl}/webhook`);
-    console.log(`🔐 Verify Token: ${config.verifyToken}`);
-    console.log(`🔑 WhatsApp Token: ${config.whatsappToken.substring(0, 20)}... (${config.whatsappToken.length} caracteres)`);
-    console.log(`📱 Phone Number ID: ${config.phoneNumberId}`);
-    console.log('\n📝 Configure o webhook no Meta for Developers:');
-    console.log(`   URL: ${config.webhookUrl}/webhook`);
-    console.log(`   Verify Token: ${config.verifyToken}`);
-    console.log('   Campos: messages, statuses\n');
+    console.log(`📚 Swagger UI: http://localhost:${config.port}/api-docs`);
+    console.log(`❤️  Health Check: http://localhost:${config.port}/health`);
+    
+    if (config.phoneNumberId && config.whatsappToken) {
+        console.log(`\n📱 WhatsApp Bot configurado:`);
+        console.log(`   📡 Webhook URL: ${config.webhookUrl}/webhook`);
+        console.log(`   🔐 Verify Token: ${config.verifyToken}`);
+        console.log(`   📱 Phone Number ID: ${config.phoneNumberId}`);
+    } else {
+        console.log(`\n⚠️  WhatsApp não configurado - apenas APIs REST disponíveis`);
+    }
+    
+    console.log(`\n📋 APIs disponíveis:`);
+    console.log(`   🌾 USDA: /api/usda/*`);
+    console.log(`   🌤️  OpenWeather: /api/weather/*`);
+    console.log(`   🗺️  Clima: /api/clima/*`);
+    console.log('');
 });
 
 // Tratamento de erros não capturados
